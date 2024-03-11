@@ -55,7 +55,7 @@ const server = Bun.serve({
 });
 
 const getAccessToken = async (code: string) => {
-  const response = await fetch("https://bun.sh/api", {
+  const response = await fetch("co", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -74,3 +74,44 @@ const getAccessToken = async (code: string) => {
 console.log(`Listening on http://localhost:${server.port} ...`);
 
 // http://localhost:8888/callback?code=AQCXL_Gbdpm036eyzOgGPsCNQ-AFB6oFSQP3qfR_x4UrBsOKbnvRFiUsP7bLoDepYWqy5hgZV_3dEhdkKhlm0ThMFgGtskXaNys_hJSLlTzSgyoWgl_GzkmGlWTvc2W_mrENN_Nr-g56-qayPowo89Bhiri2Wx5vq7Tw0znkBtIhqwYKUc3dQXQq49vTxsGbDdo6wAa7nGHMyxTOQtYS1348jdF1Vssbof8DrqBK9aewHFZwp_73A8xHXLtev-cFkQ
+
+interface SpotifyTrackHistoryItem {
+  trackId: string;
+  trackName: string;
+  artists: Array<{
+    artistId: string;
+    artistName: string;
+  }>;
+  album: {
+    albumId: string;
+    albumName: string;
+    releaseDate: string; // ISO 8601 format
+  };
+  trackDurationMs: number;
+  trackPopularity: number;
+  explicit: boolean;
+  playedAt: string; // ISO 8601 date-time format
+  context: {
+    type: string; // e.g., "playlist", "album"
+    contextUri: string; // URI of the context
+  } | null; // Context might not always be available
+  genres: Array<string>; // This requires an additional request to the artist's endpoint
+  market: string;
+}
+interface SpotifyTrackAudioFeatures {
+  acousticness: number; // 0.0 to 1.0, likelihood of being acoustic
+  danceability: number; // 0.0 to 1.0, suitability for dancing
+  energy: number; // 0.0 to 1.0, intensity and activity level
+  instrumentalness: number; // 0.0 to 1.0, likelihood of no vocals
+  liveness: number; // 0.0 to 1.0, presence of audience sound
+  loudness: number; // dB, overall loudness of track
+  speechiness: number; // 0.0 to 1.0, presence of spoken words
+  tempo: number; // BPM, overall estimated tempo
+  valence: number; // 0.0 to 1.0, musical positiveness conveyed
+}
+
+interface SpotifyTrackHistoryItem {
+  // Existing fields...
+  audioFeatures: SpotifyTrackAudioFeatures;
+  // Additional calculated or fetched fields can be added here
+}
